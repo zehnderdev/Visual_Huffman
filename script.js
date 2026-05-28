@@ -12,6 +12,5 @@ function visualizeHuffman() {
     
     for (const [char,freq] of charFreq.entries()) {
         document.querySelector('#huffmanTree').innerHTML += `<p>${char} with frequencie :  ${freq} </p>`
-        
     }
 }
