@@ -45,9 +45,6 @@ class PriorityQueue{
     getMin(){
         return(this.items[0]);
     }
-    extractMin(){
-        return(this.items[0]);
-    }
     insert(tuple){
        // insert at the end  
        let arr = this.items;
@@ -72,6 +69,40 @@ class PriorityQueue{
             i = p;
         }
     }
+    // extract Root 
+    extractMin(){
+        let arr = this.items;
+        if(arr.length ==1){
+            return arr.pop();
+        }
+        // store min value to return
+        // restore heap feature of root
+        let min = arr[0];
+        arr[0] = arr[arr.length-1];
+        arr.pop();
+        this.minHeapify(0);
+
+        return min;
+    }
+
+    // assume subtrees are already heapified
     minHeapify(i){
+        let arr = this.items;
+        // look at children swap with smallest child
+        let smallest = i;
+        let length = arr.length;
+        let l = this.left(i);
+        let r = this.right(i);
+        if(l < length && arr[l] < arr[smallest]){
+            smallest = l;
+        }
+        if(r < length && arr[r] < arr[smallest]){
+            smallest = r;
+        }
+        // check if we don´t have to swap because parent is the smallest
+        if(smallest !== i){
+            [arr[i],arr[smallest]] =  [arr[smallest],arr[i]];
+            this.minHeapify(smallest);
+        }
     }
 }
