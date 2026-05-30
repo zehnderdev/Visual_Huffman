@@ -1,5 +1,3 @@
-import { PriorityQueue } from "./PriorityQueue.js";
-
 function visualizeHuffman() {
     const input = document.querySelector('#Input').value;
     document.querySelector('#huffmanTree').innerHTML = `<p>You entered: ${input}</p>`; 
@@ -21,8 +19,9 @@ function stepHuffman(){
     document.querySelector('#huffmanTree').innerHTML += '<p>Bomba</p>'
 }
 
-function fullHuffman(char,freq,n){
+function fullHuffman(){
     let queue = new PriorityQueue();
-
+    queue.insert(['s',50]);
+    console.log(queue.getMin());
 }
 

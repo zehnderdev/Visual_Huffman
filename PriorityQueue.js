@@ -2,7 +2,7 @@
 * Basic Priority Queue Implementation as a min heap 
 * With using Tuple as Input
 */
-export class PriorityQueue{
+class PriorityQueue{
     // based on a min heap
     // min heap must not be in order 
     // only parent is smaller than child for the root and every subTree
