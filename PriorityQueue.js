@@ -1,5 +1,6 @@
 /**
-* Basic Priority Queue Implementation as a min heap
+* Basic Priority Queue Implementation as a min heap 
+* With using Tuple as Input
 */
 export class PriorityQueue{
     // based on a min heap
@@ -8,6 +9,12 @@ export class PriorityQueue{
     constructor(){
         this.items =[]
     }
+    isValidTuple(tuple) {
+        return Array.isArray(tuple) &&
+           tuple.length === 2 &&
+           typeof tuple[0] === "string" &&
+           typeof tuple[1] === "number";
+    }   
     left(i){
         return((2*i)+1);
     }
@@ -22,12 +29,16 @@ export class PriorityQueue{
         return(this.items[0]);
     }
     insert(tuple){
+       // check if valid tuple 
+       if (!this.isValidTuple(tuple)) {
+           throw new TypeError("Input must be a tuple: [string, number]");
+       }
        // insert at the end  
        let arr = this.items;
        arr.push(tuple);
        // check if we need to switch parent and inserted
        let i = arr.length -1;
-       while(i > 0 && arr[this.parent(i)] > arr[i]){
+       while(i > 0 && arr[this.parent(i)][1] > arr[i][1]){
         let p = this.parent(i);
         [arr[i],arr[p]] = [arr[p], arr[i]];
         i = p;
@@ -36,9 +47,9 @@ export class PriorityQueue{
     // assumes that the val < arr[i]
     decreaseKey(i,new_val){
         let arr = this.items;
-        arr[i] =  new_val;
+        arr[i][1] =  new_val;
 
-        while (i > 0 && arr[this.parent(i)] > arr[i])
+        while (i > 0 && arr[this.parent(i)][1] > arr[i][1])
         {
             let p = this.parent(i);
             [arr[i], arr[p]] = [arr[p], arr[i]];
@@ -69,10 +80,10 @@ export class PriorityQueue{
         let length = arr.length;
         let l = this.left(i);
         let r = this.right(i);
-        if(l < length && arr[l] < arr[smallest]){
+        if(l < length && arr[l][1] < arr[smallest][1]){
             smallest = l;
         }
-        if(r < length && arr[r] < arr[smallest]){
+        if(r < length && arr[r][1] < arr[smallest][1]){
             smallest = r;
         }
         // check if we don´t have to swap because parent is the smallest
