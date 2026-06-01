@@ -62,12 +62,16 @@ function fullHuffman(){
         Q.insert(z_xy); // E.
         printArray(Q.items);
     }
-    console.log(Q.extractMin()); // 4. 
-    
+    const root = Q.extractMin(); // 4. 
+    console.log(root);
+    document.querySelector("#HuffmanRoot").innerHTML += renderTree(root);
 }
 
 function printArray(arr){
     for (let index = 0; index < arr.length; index++) {
         console.log("Item "+index+ ":",arr[index]);
     }
+}
+
+function renderTree(node) {
 }
