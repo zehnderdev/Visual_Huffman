@@ -36,7 +36,7 @@ function fullHuffman(){
     let Q = new PriorityQueue(); // 1.
 
     for (let i = 0; i < n; i++) { // 2.
-        const z = [char[i],freq[i]]; // A.
+        const z = new HuffNode(char[i],freq[i]); // A.
         Q.insert(z); // B.
     }
     // Just logging no algo 
@@ -50,9 +50,11 @@ function fullHuffman(){
         console.log("Iteration "+i);
         const x = Q.extractMin(); // A.
         const y = Q.extractMin(); // B.
-        console.log("x= "+x);
-        console.log("y= "+y);
-        const z_xy = [x[0]+y[0],x[1]+y[1]]; // C.
+        console.log("x= ",x);
+        console.log("y= ",y);
+        const z_xy = new HuffNode(x.char+y.char,x.freq+y.freq); // C.
+        z_xy.left = x; // D.
+        z_xy.right = y; // D.
         printArray(Q.items);
         console.log(z_xy,i);
         
@@ -66,6 +68,6 @@ function fullHuffman(){
 
 function printArray(arr){
     for (let index = 0; index < arr.length; index++) {
-        console.log("Item "+index+ ":"+arr[index]);
+        console.log("Item "+index+ ":",arr[index]);
     }
 }

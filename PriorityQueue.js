@@ -1,6 +1,6 @@
 /**
 * Basic Priority Queue Implementation as a min heap 
-* With using Tuple as Input
+* With using Nodes as Input
 */
 class PriorityQueue{
     // based on a min heap
@@ -9,11 +9,12 @@ class PriorityQueue{
     constructor(){
         this.items =[]
     }
-    isValidTuple(tuple) {
-        return Array.isArray(tuple) &&
-           tuple.length === 2 &&
-           typeof tuple[0] === "string" &&
-           typeof tuple[1] === "number";
+    isValidNode(node) {
+    return node instanceof HuffNode &&
+        (typeof node.char === "string" || node.char === null) &&
+        typeof node.freq === "number" &&
+        (node.left === null || node.left instanceof HuffNode) &&
+        (node.right === null || node.right instanceof HuffNode);
     }   
     left(i){
         return((2*i)+1);
@@ -28,14 +29,14 @@ class PriorityQueue{
     getMin(){
         return(this.items[0]);
     }
-    insert(tuple){
-       // check if valid tuple 
-       if (!this.isValidTuple(tuple)) {
-           throw new TypeError("Input must be a tuple: [string, number]");
+    insert(node){
+       // check if valid Node
+       if (!this.isValidNode(node)) {
+           throw new TypeError("Input must be a Node with:[string, number,node?,node?]");
        }
        // insert at the end  
        let arr = this.items;
-       arr.push(tuple);
+       arr.push(node);
        // check if we need to switch parent and inserted
        let i = arr.length -1;
        while(i > 0 && arr[this.parent(i)][1] > arr[i][1]){
