@@ -39,7 +39,7 @@ class PriorityQueue{
        arr.push(node);
        // check if we need to switch parent and inserted
        let i = arr.length -1;
-       while(i > 0 && arr[this.parent(i)][1] > arr[i][1]){
+       while(i > 0 && arr[this.parent(i)].freq > arr[i].freq){
         let p = this.parent(i);
         [arr[i],arr[p]] = [arr[p], arr[i]];
         i = p;
@@ -48,9 +48,9 @@ class PriorityQueue{
     // assumes that the val < arr[i]
     decreaseKey(i,new_val){
         let arr = this.items;
-        arr[i][1] =  new_val;
+        arr[i].freq =  new_val;
 
-        while (i > 0 && arr[this.parent(i)][1] > arr[i][1])
+        while (i > 0 && arr[this.parent(i)].freq > arr[i].freq)
         {
             let p = this.parent(i);
             [arr[i], arr[p]] = [arr[p], arr[i]];
@@ -81,10 +81,10 @@ class PriorityQueue{
         let length = arr.length;
         let l = this.left(i);
         let r = this.right(i);
-        if(l < length && arr[l][1] < arr[smallest][1]){
+        if(l < length && arr[l].freq < arr[smallest].freq){
             smallest = l;
         }
-        if(r < length && arr[r][1] < arr[smallest][1]){
+        if(r < length && arr[r].freq < arr[smallest].freq){
             smallest = r;
         }
         // check if we don´t have to swap because parent is the smallest
