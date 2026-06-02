@@ -11,6 +11,7 @@ const huffmanState = {
     input: "",
     root: null,
     charFreq: null,
+    tableVisible: false,
     selectedVariant: "wide-tidy"
 };
 
@@ -20,16 +21,26 @@ function fullHuffman() {
         return;
     }
 
+    updateTableButton();
     renderHuffmanOutput(huffmanState.root);
 }
 
 function showHuffmanTable() {
+    if (huffmanState.tableVisible) {
+        huffmanState.tableVisible = false;
+        document.querySelector("#huffmanTree").innerHTML = renderFrequencyList(huffmanState.charFreq);
+        updateTableButton();
+        return;
+    }
+
     const prepared = prepareHuffmanState();
     if (!prepared) {
         return;
     }
 
+    huffmanState.tableVisible = true;
     document.querySelector("#huffmanTree").innerHTML = renderHuffmanTable(huffmanState.root, huffmanState.charFreq);
+    updateTableButton();
 }
 
 function setTreeVariant(variantId) {
@@ -44,8 +55,10 @@ function prepareHuffmanState() {
         huffmanState.input = "";
         huffmanState.root = null;
         huffmanState.charFreq = null;
+        huffmanState.tableVisible = false;
         document.querySelector("#huffmanTree").innerHTML = `<p class="empty-state">Enter text first.</p>`;
         document.querySelector("#HuffmanRoot").innerHTML = "";
+        updateTableButton();
         return false;
     }
 
@@ -55,10 +68,18 @@ function prepareHuffmanState() {
     huffmanState.input = input;
     huffmanState.root = root;
     huffmanState.charFreq = charFreq;
+    huffmanState.tableVisible = false;
 
     document.querySelector("#huffmanTree").innerHTML = renderFrequencyList(charFreq);
 
     return true;
+}
+
+function updateTableButton() {
+    const tableButton = document.querySelector("#Table");
+
+    tableButton.hidden = !huffmanState.root;
+    tableButton.textContent = huffmanState.tableVisible ? "Hide Table" : "Table";
 }
 
 function getCharFrequency(input) {
