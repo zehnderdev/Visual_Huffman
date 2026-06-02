@@ -729,25 +729,57 @@ function renderFrequencyList(charFreq) {
 
 function renderHuffmanTable(root, charFreq) {
     const codes = getHuffmanCodes(root);
+    const stats = getHuffmanStats(charFreq, codes);
     const rows = Array.from(charFreq.entries())
         .sort(([charA], [charB]) => charA.localeCompare(charB));
 
     return `
-        <table class="huffman-table">
-            <thead>
-                <tr><th>Char</th><th>Freq</th><th>Code</th></tr>
-            </thead>
-            <tbody>
-                ${rows.map(([char, freq]) => `
-                    <tr>
-                        <td>${escapeHTML(formatChar(char))}</td>
-                        <td>${escapeHTML(freq)}</td>
-                        <td>${escapeHTML(codes.get(char))}</td>
-                    </tr>
-                `).join("")}
-            </tbody>
-        </table>
+        <div class="stats-grid">
+            <div class="stat-card"><span>Zeichen</span><strong>${escapeHTML(stats.totalChars)}</strong></div>
+            <div class="stat-card"><span>Symbole</span><strong>${escapeHTML(stats.uniqueSymbols)}</strong></div>
+            <div class="stat-card"><span>Originaldaten</span><strong>${escapeHTML(stats.originalBits)} bits</strong></div>
+            <div class="stat-card"><span>Huffman</span><strong>${escapeHTML(stats.huffmanBits)} bits</strong></div>
+            <div class="stat-card"><span>Gespart</span><strong>${escapeHTML(stats.savedPercent)}%</strong></div>
+        </div>
+        <div class="table-wrap">
+            <table class="huffman-table">
+                <thead>
+                    <tr><th>Zeichen</th><th>Freq</th><th>Code</th></tr>
+                </thead>
+                <tbody>
+                    ${rows.map(([char, freq]) => {
+                        const code = codes.get(char);
+
+                        return `
+                            <tr>
+                                <td>${escapeHTML(formatChar(char))}</td>
+                                <td>${escapeHTML(freq)}</td>
+                                <td>${escapeHTML(code)}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        </div>
     `;
+}
+
+function getHuffmanStats(charFreq, codes) {
+    const totalChars = Array.from(charFreq.values()).reduce((sum, freq) => sum + freq, 0);
+    const huffmanBits = Array.from(charFreq.entries())
+        .reduce((sum, [char, freq]) => sum + freq * codes.get(char).length, 0);
+    const originalBits = totalChars * 8;
+    const savedPercent = originalBits === 0
+        ? 0
+        : ((originalBits - huffmanBits) / originalBits) * 100;
+
+    return {
+        totalChars,
+        uniqueSymbols: charFreq.size,
+        originalBits,
+        huffmanBits,
+        savedPercent: savedPercent.toFixed(1)
+    };
 }
 
 function getHuffmanCodes(root) {

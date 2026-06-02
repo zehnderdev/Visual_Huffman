@@ -30,6 +30,11 @@ button { color: #fff; background: #222; cursor: pointer; }
 .frequency-chip { display: inline-flex; gap: 8px; padding: 5px 8px; }
 .frequency-chip span, .tree-code-readout, .node-symbol, .node-freq, .edge-label text { font-family: "Courier New", monospace; }
 .empty-state, .tree-card { padding: 12px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.stat-card { border: 1px solid #ccc; background: #fff; padding: 10px; }
+.stat-card span { display: block; color: #666; font-size: 12px; }
+.stat-card strong { display: block; margin-top: 4px; font-size: 20px; }
+.table-wrap { overflow-x: auto; }
 .huffman-table { width: 100%; border-collapse: collapse; }
 .huffman-table th, .huffman-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
 .huffman-table th { background: #eee; }
