@@ -23,6 +23,15 @@ function fullHuffman() {
     renderHuffmanOutput(huffmanState.root);
 }
 
+function showHuffmanTable() {
+    const prepared = prepareHuffmanState();
+    if (!prepared) {
+        return;
+    }
+
+    document.querySelector("#huffmanTree").innerHTML = renderHuffmanTable(huffmanState.root, huffmanState.charFreq);
+}
+
 function setTreeVariant(variantId) {
     huffmanState.selectedVariant = variantId;
     renderHuffmanOutput(huffmanState.root);
@@ -716,6 +725,51 @@ function renderFrequencyList(charFreq) {
             `).join("")}
         </div>
     `;
+}
+
+function renderHuffmanTable(root, charFreq) {
+    const codes = getHuffmanCodes(root);
+    const rows = Array.from(charFreq.entries())
+        .sort(([charA], [charB]) => charA.localeCompare(charB));
+
+    return `
+        <table class="huffman-table">
+            <thead>
+                <tr><th>Char</th><th>Freq</th><th>Code</th></tr>
+            </thead>
+            <tbody>
+                ${rows.map(([char, freq]) => `
+                    <tr>
+                        <td>${escapeHTML(formatChar(char))}</td>
+                        <td>${escapeHTML(freq)}</td>
+                        <td>${escapeHTML(codes.get(char))}</td>
+                    </tr>
+                `).join("")}
+            </tbody>
+        </table>
+    `;
+}
+
+function getHuffmanCodes(root) {
+    const codes = new Map();
+
+    function walk(node, code) {
+        if (!node.left && !node.right) {
+            codes.set(node.char, code || "0");
+            return;
+        }
+
+        if (node.left) {
+            walk(node.left, `${code}0`);
+        }
+
+        if (node.right) {
+            walk(node.right, `${code}1`);
+        }
+    }
+
+    walk(root, "");
+    return codes;
 }
 
 function getVariantById(variantId) {

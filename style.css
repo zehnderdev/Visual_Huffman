@@ -13,7 +13,7 @@ button, input { font: inherit; }
 h1 { margin: 0; font-size: 32px; }
 .control-strip {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 8px;
   margin-bottom: 16px;
   padding: 10px;
@@ -26,10 +26,13 @@ button { color: #fff; background: #222; cursor: pointer; }
 .frequency-panel, .variant-toolbar { margin-bottom: 16px; }
 .frequency-header, .tree-card-header { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
 .frequency-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.frequency-chip, .empty-state, .tree-card, .tree-code-readout { border: 1px solid #ccc; background: #fff; }
+.frequency-chip, .empty-state, .tree-card, .tree-code-readout, .huffman-table { border: 1px solid #ccc; background: #fff; }
 .frequency-chip { display: inline-flex; gap: 8px; padding: 5px 8px; }
 .frequency-chip span, .tree-code-readout, .node-symbol, .node-freq, .edge-label text { font-family: "Courier New", monospace; }
 .empty-state, .tree-card { padding: 12px; }
+.huffman-table { width: 100%; border-collapse: collapse; }
+.huffman-table th, .huffman-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+.huffman-table th { background: #eee; }
 .variant-tabs { display: flex; gap: 6px; overflow-x: auto; }
 .variant-tab { min-height: 34px; color: #111; background: #fff; border-color: #ccc; white-space: nowrap; }
 .variant-tab.active { color: #fff; background: #222; }
