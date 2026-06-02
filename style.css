@@ -1,0 +1,62 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #111;
+  background: #f7f7f7;
+  font-family: Arial, Helvetica, sans-serif;
+}
+button, input { font: inherit; }
+.app-shell { width: min(1200px, calc(100% - 24px)); margin: 0 auto; padding: 24px 0; }
+.app-header { margin-bottom: 16px; }
+.eyebrow { margin: 0 0 4px; color: #666; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+h1 { margin: 0; font-size: 32px; }
+.control-strip {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+#Input, button { min-height: 40px; border: 1px solid #222; border-radius: 4px; padding: 0 12px; }
+#Input { width: 100%; background: #fff; }
+button { color: #fff; background: #222; cursor: pointer; }
+.frequency-panel, .variant-toolbar { margin-bottom: 16px; }
+.frequency-header, .tree-card-header { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+.frequency-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.frequency-chip, .empty-state, .tree-card, .tree-code-readout { border: 1px solid #ccc; background: #fff; }
+.frequency-chip { display: inline-flex; gap: 8px; padding: 5px 8px; }
+.frequency-chip span, .tree-code-readout, .node-symbol, .node-freq, .edge-label text { font-family: "Courier New", monospace; }
+.empty-state, .tree-card { padding: 12px; }
+.variant-tabs { display: flex; gap: 6px; overflow-x: auto; }
+.variant-tab { min-height: 34px; color: #111; background: #fff; border-color: #ccc; white-space: nowrap; }
+.variant-tab.active { color: #fff; background: #222; }
+.tree-card { overflow: hidden; }
+.tree-card h2 { margin: 0; font-size: 16px; }
+.tree-code-readout { padding: 4px 8px; font-size: 12px; }
+.tree-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(360px, 70vh, 760px);
+  overflow: hidden;
+}
+.huffman-svg { display: block; width: 100%; height: 100%; }
+.tree-edge { fill: none; stroke: #333; stroke-width: 2.2px; stroke-linecap: round; stroke-linejoin: round; }
+.tree-edge.code-zero { stroke: #006b5b; }
+.tree-edge.code-one { stroke: #9a2d20; }
+.tree-edge.is-hot { stroke-width: 4px; }
+.edge-label rect, .node-core { fill: #fff; stroke: #111; }
+.edge-label text, .node-symbol, .node-freq { fill: #111; text-anchor: middle; pointer-events: none; }
+.edge-label text { font-size: 12px; font-weight: 700; dominant-baseline: middle; }
+.node-halo { fill: transparent; }
+.node-core { stroke-width: 2px; }
+.tree-node.is-hot .node-core { stroke-width: 4px; }
+.node-symbol { font-size: 13px; font-weight: 700; }
+.node-freq { font-size: 10px; }
+@media (max-width: 650px) {
+  .app-shell { width: calc(100% - 16px); }
+  .control-strip { grid-template-columns: 1fr; }
+}

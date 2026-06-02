@@ -7,15 +7,23 @@
   <title>Visual Huffman</title>
 </head>
 <body>
-  <h1>Welcome to Huffman Visualizer</h1>
-  <input id="Input" type="text" placeholder="Enter text">
-    <button onclick="visualizeHuffman()">Visualize</button>
-    <button id="Step" onclick="stepHuffman()" style="display: none;">Step</button>
-    <button id="Full" onclick="fullHuffman()">Full</button>
-    <div id="huffmanTree"></div>
-    <div id="HuffmanRoot"></div>
-    <script src="PriorityQueue.js"></script>
-    <script src="HuffNode.js"></script>
-    <script src="script.js"></script>
+  <main class="app-shell">
+    <header class="app-header">
+      <p class="eyebrow">Visual Huffman</p>
+      <h1>Huffman Layout Gallery</h1>
+    </header>
+
+    <form class="control-strip" onsubmit="event.preventDefault(); fullHuffman();">
+      <input id="Input" type="text" placeholder="Enter text" autocomplete="off">
+      <button id="Full" type="submit">Build</button>
+    </form>
+
+    <section id="huffmanTree" class="frequency-panel" aria-live="polite"></section>
+    <section id="HuffmanRoot" class="tree-stage" aria-live="polite"></section>
+  </main>
+
+  <script src="HuffNode.js"></script>
+  <script src="PriorityQueue.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
