@@ -26,7 +26,7 @@
     \vspace{0.5cm}
     \begin{minipage}[t][1.45cm][c]{\linewidth}
         \centering
-        \includegraphics[width=0.42\linewidth]{kurzvortrag/image.png}
+        \includegraphics[width=0.42\linewidth]{image.png}
     \end{minipage}
 
     \vspace{0.5cm}
@@ -49,7 +49,7 @@
     \vspace{0.5cm}
     \begin{minipage}[t][1.45cm][c]{\linewidth}
         \centering
-        \includegraphics[width=0.32\linewidth]{kurzvortrag/image.png}
+        \includegraphics[width=0.32\linewidth]{image.png}
     \end{minipage}
 
     \vspace{0.5cm}
@@ -83,53 +83,6 @@ $\text{und} \qquad
 
 \begin{frame}{Prefixfreie Codes als Binärbaum}
 
-\begin{columns}[T,onlytextwidth]
-
-\column{0.48\textwidth}
-\centering
-\textbf{Nicht prefixfrei}
-
-\[
-\begin{array}{c}
-\xymatrix{
-& \bullet \ar[dl]_{0} \ar[dr]^{1} & \\
-A \ar[d]_{1} & & C \\
-B & &
-}
-\end{array}
-\]
-
-\vspace{0.2cm}
-
-\[
-A=0,\quad B=01,\quad C=1
-\]
-
-\alert{$A=0$ ist Präfix von $B=01$}
-
-\column{0.48\textwidth}
-\centering
-\textbf{Prefixfrei}
-
-\[
-\begin{array}{c}
-\xymatrix{
-& \bullet \ar[dl]_{0} \ar[dr]^{1} & \\
-A & & \bullet \ar[dl]_{0} \ar[dr]^{1} \\
-& B & & C
-}
-\end{array}
-\]
-
-\vspace{0.2cm}
-
-\[
-A=0,\quad B=10,\quad C=11
-\]
-
-Kein Codewort ist Anfang eines anderen.
-
-\end{columns}
 
 \end{frame}
 \end{document}

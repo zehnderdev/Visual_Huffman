@@ -1,2 +1,22 @@
 .vscode
 SKILL.md
+# LaTeX build files
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# PDFs nicht pushen
+*.pdf
+
+# Beamer / latexmk extra
+*.bbl
+*.blg
+*.bcf
+*.run.xml
