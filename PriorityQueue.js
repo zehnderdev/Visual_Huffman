@@ -11,7 +11,7 @@ class PriorityQueue{
     }
     isValidNode(node) {
     return node instanceof HuffNode &&
-        (typeof node.char === "string" || node.char === null) &&
+        (typeof node.char === "string" || typeof node.char === "number" || node.char === null) &&
         typeof node.freq === "number" &&
         (node.left === null || node.left instanceof HuffNode) &&
         (node.right === null || node.right instanceof HuffNode);

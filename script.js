@@ -8,11 +8,17 @@ const TREE_VARIANTS = [
 ];
 
 const huffmanState = {
+    sourceType: "text",
     input: "",
     root: null,
     charFreq: null,
     tableVisible: false,
-    selectedVariant: "wide-tidy"
+    selectedVariant: "wide-tidy",
+    file: null,
+    fileCompression: null,
+    compressedBlob: null,
+    downloadUrl: null,
+    fileBusy: false
 };
 
 function fullHuffman() {
@@ -26,15 +32,17 @@ function fullHuffman() {
 }
 
 function showHuffmanTable() {
-    if (huffmanState.tableVisible) {
-        huffmanState.tableVisible = false;
-        document.querySelector("#huffmanTree").innerHTML = renderFrequencyList(huffmanState.charFreq);
-        updateTableButton();
-        return;
+    if (!huffmanState.root || !huffmanState.charFreq) {
+        const prepared = prepareHuffmanState();
+        if (!prepared) {
+            return;
+        }
     }
 
-    const prepared = prepareHuffmanState();
-    if (!prepared) {
+    if (huffmanState.tableVisible) {
+        huffmanState.tableVisible = false;
+        document.querySelector("#huffmanTree").innerHTML = renderCurrentSummary();
+        updateTableButton();
         return;
     }
 
@@ -52,12 +60,15 @@ function prepareHuffmanState() {
     const input = document.querySelector("#Input").value;
 
     if (input.length === 0) {
+        huffmanState.sourceType = "text";
         huffmanState.input = "";
         huffmanState.root = null;
         huffmanState.charFreq = null;
+        huffmanState.fileCompression = null;
         huffmanState.tableVisible = false;
         document.querySelector("#huffmanTree").innerHTML = `<p class="empty-state">Enter text first.</p>`;
         document.querySelector("#HuffmanRoot").innerHTML = "";
+        clearDownloadLink();
         updateTableButton();
         return false;
     }
@@ -65,12 +76,15 @@ function prepareHuffmanState() {
     const charFreq = getCharFrequency(input);
     const root = buildHuffmanTree(charFreq);
 
+    huffmanState.sourceType = "text";
     huffmanState.input = input;
     huffmanState.root = root;
     huffmanState.charFreq = charFreq;
+    huffmanState.fileCompression = null;
     huffmanState.tableVisible = false;
+    clearDownloadLink();
 
-    document.querySelector("#huffmanTree").innerHTML = renderFrequencyList(charFreq);
+    document.querySelector("#huffmanTree").innerHTML = renderCurrentSummary();
 
     return true;
 }
@@ -80,6 +94,131 @@ function updateTableButton() {
 
     tableButton.hidden = !huffmanState.root;
     tableButton.textContent = huffmanState.tableVisible ? "Hide Table" : "Table";
+}
+
+function renderCurrentSummary() {
+    if (huffmanState.sourceType === "file") {
+        return renderFileSummary();
+    }
+
+    return renderFrequencyList(huffmanState.charFreq);
+}
+
+function renderFileSummary() {
+    const file = huffmanState.file;
+    const byteFreq = huffmanState.charFreq;
+    const compression = huffmanState.fileCompression || { payload: new Uint8Array(0), bitLength: 0 };
+    const compressedBlob = huffmanState.compressedBlob;
+
+    if (!file || !byteFreq) {
+        return `<p class="empty-state">No file selected.</p>`;
+    }
+
+    const stats = getFileStats(file, byteFreq, compression, compressedBlob);
+
+    return `
+        <div class="file-result-header">
+            <div>
+                <strong>${escapeHTML(file.name || "file")}</strong>
+                <span>${escapeHTML(file.type || "application/octet-stream")}</span>
+            </div>
+            <div>
+                <strong>${escapeHTML(getCompressedFileName(file.name))}</strong>
+                <span>${escapeHTML(stats.finalSize)}</span>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><span>Original</span><strong>${escapeHTML(stats.originalSize)}</strong></div>
+            <div class="stat-card"><span>Bytes</span><strong>${escapeHTML(stats.totalBytes)}</strong></div>
+            <div class="stat-card"><span>Symbole</span><strong>${escapeHTML(stats.uniqueSymbols)}</strong></div>
+            <div class="stat-card"><span>Bitstream</span><strong>${escapeHTML(stats.huffmanBits)} bits</strong></div>
+            <div class="stat-card"><span>Payload</span><strong>${escapeHTML(stats.payloadSize)}</strong></div>
+            <div class="stat-card"><span>Gespart</span><strong>${escapeHTML(stats.finalPercent)}%</strong></div>
+        </div>
+        ${renderFrequencyList(byteFreq)}
+    `;
+}
+
+function getFileStats(file, byteFreq, compression, compressedBlob) {
+    const originalSize = file.size;
+    const finalSize = compressedBlob ? compressedBlob.size : 0;
+    const finalPercent = originalSize === 0
+        ? 0
+        : ((originalSize - finalSize) / originalSize) * 100;
+
+    return {
+        originalSize: formatBytes(originalSize),
+        totalBytes: Array.from(byteFreq.values()).reduce((sum, freq) => sum + freq, 0),
+        uniqueSymbols: byteFreq.size,
+        huffmanBits: compression.bitLength,
+        payloadSize: formatBytes(compression.payload.length),
+        finalSize: formatBytes(finalSize),
+        finalPercent: finalPercent.toFixed(1)
+    };
+}
+
+function updateFileControls() {
+    const button = document.querySelector("#CompressFile");
+    const file = huffmanState.file;
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = !file || huffmanState.fileBusy;
+    button.textContent = huffmanState.fileBusy ? "Compressing..." : "Compress file";
+
+    if (!file) {
+        setFileStatus("No file selected.");
+    } else if (!huffmanState.fileBusy) {
+        setFileStatus(`${file.name || "file"} - ${formatBytes(file.size)}`);
+    }
+}
+
+function setFileBusy(isBusy) {
+    huffmanState.fileBusy = isBusy;
+    updateFileControls();
+}
+
+function setFileStatus(message) {
+    const status = document.querySelector("#FileStatus");
+
+    if (status) {
+        status.textContent = message;
+    }
+}
+
+function clearDownloadLink() {
+    if (huffmanState.downloadUrl) {
+        URL.revokeObjectURL(huffmanState.downloadUrl);
+    }
+
+    huffmanState.downloadUrl = null;
+    huffmanState.compressedBlob = null;
+
+    const link = document.querySelector("#DownloadFile");
+
+    if (!link) {
+        return;
+    }
+
+    link.hidden = true;
+    link.removeAttribute("href");
+    link.removeAttribute("download");
+    link.textContent = "Download .vhuff";
+}
+
+function updateDownloadLink(file, compressedBlob, downloadUrl) {
+    const link = document.querySelector("#DownloadFile");
+
+    if (!link) {
+        return;
+    }
+
+    link.hidden = false;
+    link.href = downloadUrl;
+    link.download = getCompressedFileName(file.name);
+    link.textContent = `Download .vhuff (${formatBytes(compressedBlob.size)})`;
 }
 
 function getCharFrequency(input) {
@@ -92,10 +231,136 @@ function getCharFrequency(input) {
     return charFreq;
 }
 
+async function handleFileSelection(event) {
+    const [file] = event.target.files;
+
+    huffmanState.file = file || null;
+    updateFileControls();
+
+    if (file) {
+        await compressSelectedFile();
+    }
+}
+
+async function compressSelectedFile() {
+    const fileInput = document.querySelector("#FileInput");
+    const file = huffmanState.file || (fileInput && fileInput.files[0]);
+
+    if (!file) {
+        setFileStatus("No file selected.");
+        updateFileControls();
+        return;
+    }
+
+    setFileBusy(true);
+    setFileStatus(`${file.name || "file"} - ${formatBytes(file.size)}`);
+
+    try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const byteFreq = getByteFrequency(bytes);
+        const root = buildHuffmanTree(byteFreq);
+        const codes = root ? getHuffmanCodes(root) : new Map();
+        const compression = root
+            ? compressBytes(bytes, codes)
+            : { payload: new Uint8Array(0), bitLength: 0 };
+        const compressedBlob = createCompressedHuffmanFile(file, byteFreq, codes, compression);
+
+        clearDownloadLink();
+
+        const downloadUrl = URL.createObjectURL(compressedBlob);
+
+        huffmanState.sourceType = "file";
+        huffmanState.file = file;
+        huffmanState.root = root;
+        huffmanState.charFreq = byteFreq;
+        huffmanState.fileCompression = compression;
+        huffmanState.compressedBlob = compressedBlob;
+        huffmanState.downloadUrl = downloadUrl;
+        huffmanState.tableVisible = false;
+
+        updateDownloadLink(file, compressedBlob, downloadUrl);
+        updateFileControls();
+        updateTableButton();
+
+        document.querySelector("#huffmanTree").innerHTML = renderCurrentSummary();
+        renderHuffmanOutput(root);
+    } catch (error) {
+        console.error(error);
+        clearDownloadLink();
+        setFileStatus("File compression failed.");
+    } finally {
+        setFileBusy(false);
+    }
+}
+
+function getByteFrequency(bytes) {
+    const byteFreq = new Map();
+
+    for (const byte of bytes) {
+        byteFreq.set(byte, (byteFreq.get(byte) || 0) + 1);
+    }
+
+    return byteFreq;
+}
+
+function compressBytes(bytes, codes) {
+    const bitLength = bytes.reduce((sum, byte) => sum + (codes.get(byte) || "").length, 0);
+    const payload = new Uint8Array(Math.ceil(bitLength / 8));
+    let bitIndex = 0;
+
+    for (const byte of bytes) {
+        const code = codes.get(byte) || "";
+
+        for (const bit of code) {
+            if (bit === "1") {
+                payload[bitIndex >> 3] |= 1 << (7 - (bitIndex & 7));
+            }
+
+            bitIndex += 1;
+        }
+    }
+
+    return { payload, bitLength };
+}
+
+function createCompressedHuffmanFile(file, byteFreq, codes, compression) {
+    const header = {
+        format: "visual-huffman",
+        version: 1,
+        originalName: file.name || "file",
+        mimeType: file.type || "",
+        originalSize: file.size,
+        bitLength: compression.bitLength,
+        paddingBits: (8 - (compression.bitLength % 8)) % 8,
+        frequencies: Array.from(byteFreq.entries())
+            .sort(([byteA], [byteB]) => byteA - byteB),
+        codes: Array.from(codes.entries())
+            .sort(([byteA], [byteB]) => byteA - byteB)
+    };
+    const encoder = new TextEncoder();
+    const headerBytes = encoder.encode(JSON.stringify(header));
+    const prefix = new Uint8Array(8);
+    const view = new DataView(prefix.buffer);
+
+    prefix[0] = 0x56;
+    prefix[1] = 0x48;
+    prefix[2] = 0x46;
+    prefix[3] = 0x31;
+    view.setUint32(4, headerBytes.length, true);
+
+    return new Blob([prefix, headerBytes, compression.payload], {
+        type: "application/x-visual-huffman"
+    });
+}
+
 function buildHuffmanTree(charFreq) {
     const queue = new PriorityQueue();
     const entries = Array.from(charFreq.entries())
-        .sort(([charA, freqA], [charB, freqB]) => freqA - freqB || charA.localeCompare(charB));
+        .sort(compareFrequencyEntriesAscending);
+
+    if (entries.length === 0) {
+        return null;
+    }
 
     for (let i = 0; i < entries.length; i++) {
         const [char, freq] = entries[i];
@@ -111,7 +376,7 @@ function buildHuffmanTree(charFreq) {
     while (queue.items.length > 1) {
         const left = queue.extractMin();
         const right = queue.extractMin();
-        const merged = new HuffNode(left.char + right.char, left.freq + right.freq, left, right);
+        const merged = new HuffNode(null, left.freq + right.freq, left, right);
 
         queue.insert(merged);
     }
@@ -121,7 +386,10 @@ function buildHuffmanTree(charFreq) {
 
 function renderHuffmanOutput(root) {
     if (!root) {
-        document.querySelector("#HuffmanRoot").innerHTML = `<p class="empty-state">Build a tree first.</p>`;
+        const message = huffmanState.sourceType === "file"
+            ? "No Huffman tree for an empty file."
+            : "Build a tree first.";
+        document.querySelector("#HuffmanRoot").innerHTML = `<p class="empty-state">${message}</p>`;
         return;
     }
 
@@ -728,19 +996,23 @@ function bindTreeInteractions() {
 }
 
 function renderFrequencyList(charFreq) {
+    if (!charFreq || charFreq.size === 0) {
+        return `<p class="empty-state">No symbols found.</p>`;
+    }
+
     const total = Array.from(charFreq.values()).reduce((sum, freq) => sum + freq, 0);
     const entries = Array.from(charFreq.entries())
-        .sort(([charA, freqA], [charB, freqB]) => freqB - freqA || charA.localeCompare(charB));
+        .sort(compareFrequencyEntriesDescending);
 
     return `
         <div class="frequency-header">
-            <span>${escapeHTML(charFreq.size)} symbols</span>
+            <span>${escapeHTML(charFreq.size)} ${escapeHTML(getSymbolLabel(charFreq.size))}</span>
             <strong>${escapeHTML(total)} total</strong>
         </div>
         <div class="frequency-grid">
-            ${entries.map(([char, freq]) => `
+            ${entries.map(([symbol, freq]) => `
                 <div class="frequency-chip">
-                    <span>${escapeHTML(formatChar(char))}</span>
+                    <span>${escapeHTML(formatChar(symbol))}</span>
                     <strong>${escapeHTML(freq)}</strong>
                 </div>
             `).join("")}
@@ -749,14 +1021,19 @@ function renderFrequencyList(charFreq) {
 }
 
 function renderHuffmanTable(root, charFreq) {
+    if (!root || !charFreq || charFreq.size === 0) {
+        return `<p class="empty-state">No Huffman table for empty input.</p>`;
+    }
+
     const codes = getHuffmanCodes(root);
     const stats = getHuffmanStats(charFreq, codes);
     const rows = Array.from(charFreq.entries())
-        .sort(([charA], [charB]) => charA.localeCompare(charB));
+        .sort(([symbolA], [symbolB]) => compareSymbols(symbolA, symbolB));
+    const symbolHeader = huffmanState.sourceType === "file" ? "Byte" : "Zeichen";
 
     return `
         <div class="stats-grid">
-            <div class="stat-card"><span>Zeichen</span><strong>${escapeHTML(stats.totalChars)}</strong></div>
+            <div class="stat-card"><span>${escapeHTML(symbolHeader)}</span><strong>${escapeHTML(stats.totalSymbols)}</strong></div>
             <div class="stat-card"><span>Symbole</span><strong>${escapeHTML(stats.uniqueSymbols)}</strong></div>
             <div class="stat-card"><span>Originaldaten</span><strong>${escapeHTML(stats.originalBits)} bits</strong></div>
             <div class="stat-card"><span>Huffman</span><strong>${escapeHTML(stats.huffmanBits)} bits</strong></div>
@@ -765,15 +1042,15 @@ function renderHuffmanTable(root, charFreq) {
         <div class="table-wrap">
             <table class="huffman-table">
                 <thead>
-                    <tr><th>Zeichen</th><th>Freq</th><th>Code</th></tr>
+                    <tr><th>${escapeHTML(symbolHeader)}</th><th>Freq</th><th>Code</th></tr>
                 </thead>
                 <tbody>
-                    ${rows.map(([char, freq]) => {
-                        const code = codes.get(char);
+                    ${rows.map(([symbol, freq]) => {
+                        const code = codes.get(symbol);
 
                         return `
                             <tr>
-                                <td>${escapeHTML(formatChar(char))}</td>
+                                <td>${escapeHTML(formatChar(symbol))}</td>
                                 <td>${escapeHTML(freq)}</td>
                                 <td>${escapeHTML(code)}</td>
                             </tr>
@@ -786,16 +1063,16 @@ function renderHuffmanTable(root, charFreq) {
 }
 
 function getHuffmanStats(charFreq, codes) {
-    const totalChars = Array.from(charFreq.values()).reduce((sum, freq) => sum + freq, 0);
+    const totalSymbols = Array.from(charFreq.values()).reduce((sum, freq) => sum + freq, 0);
     const huffmanBits = Array.from(charFreq.entries())
-        .reduce((sum, [char, freq]) => sum + freq * codes.get(char).length, 0);
-    const originalBits = totalChars * 8;
+        .reduce((sum, [symbol, freq]) => sum + freq * (codes.get(symbol) || "").length, 0);
+    const originalBits = totalSymbols * 8;
     const savedPercent = originalBits === 0
         ? 0
         : ((originalBits - huffmanBits) / originalBits) * 100;
 
     return {
-        totalChars,
+        totalSymbols,
         uniqueSymbols: charFreq.size,
         originalBits,
         huffmanBits,
@@ -845,7 +1122,35 @@ function average(values) {
     return values.reduce((sum, value) => sum + value, 0) / Math.max(values.length, 1);
 }
 
+function compareFrequencyEntriesAscending([symbolA, freqA], [symbolB, freqB]) {
+    return freqA - freqB || compareSymbols(symbolA, symbolB);
+}
+
+function compareFrequencyEntriesDescending([symbolA, freqA], [symbolB, freqB]) {
+    return freqB - freqA || compareSymbols(symbolA, symbolB);
+}
+
+function compareSymbols(symbolA, symbolB) {
+    if (typeof symbolA === "number" && typeof symbolB === "number") {
+        return symbolA - symbolB;
+    }
+
+    return String(symbolA).localeCompare(String(symbolB));
+}
+
+function getSymbolLabel(count) {
+    if (huffmanState.sourceType === "file") {
+        return count === 1 ? "byte" : "bytes";
+    }
+
+    return count === 1 ? "symbol" : "symbols";
+}
+
 function formatChar(char) {
+    if (typeof char === "number") {
+        return `0x${char.toString(16).padStart(2, "0").toUpperCase()}`;
+    }
+
     if (char === " ") {
         return "space";
     }
@@ -859,6 +1164,26 @@ function formatChar(char) {
     }
 
     return char;
+}
+
+function formatBytes(bytes) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getCompressedFileName(fileName) {
+    const baseName = (fileName || "file")
+        .replace(/[\\/:*?"<>|]+/g, "_")
+        .trim() || "file";
+
+    return `${baseName}.vhuff`;
 }
 
 function escapeHTML(value) {

@@ -1,4 +1,5 @@
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -6,25 +7,57 @@ body {
   background: #f7f7f7;
   font-family: Arial, Helvetica, sans-serif;
 }
-button, input { font: inherit; }
+button, input, label, a { font: inherit; }
 .app-shell { width: min(1200px, calc(100% - 24px)); margin: 0 auto; padding: 24px 0; }
 .app-header { margin-bottom: 16px; }
 .eyebrow { margin: 0 0 4px; color: #666; font-size: 12px; font-weight: 700; text-transform: uppercase; }
 h1 { margin: 0; font-size: 32px; }
+.input-panels { display: grid; gap: 10px; margin-bottom: 16px; }
 .control-strip {
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 8px;
-  margin-bottom: 16px;
   padding: 10px;
   border: 1px solid #ccc;
   background: #fff;
 }
-#Input, button { min-height: 40px; border: 1px solid #222; border-radius: 4px; padding: 0 12px; }
+#Input, button, .file-picker, .download-link { min-height: 40px; border: 1px solid #222; border-radius: 4px; padding: 0 12px; }
 #Input { width: 100%; background: #fff; }
-button { color: #fff; background: #222; cursor: pointer; }
+button, .file-picker, .download-link { display: inline-flex; align-items: center; justify-content: center; color: #fff; background: #222; cursor: pointer; text-decoration: none; white-space: nowrap; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.file-strip {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.download-link { background: #006b5b; border-color: #006b5b; }
+.file-status {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: #555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .frequency-panel, .variant-toolbar { margin-bottom: 16px; }
 .frequency-header, .tree-card-header { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+.file-result-header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.file-result-header strong, .file-result-header span { display: block; }
+.file-result-header strong { overflow-wrap: anywhere; }
+.file-result-header span { margin-top: 2px; color: #666; font-size: 12px; }
 .frequency-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .frequency-chip, .empty-state, .tree-card, .tree-code-readout, .huffman-table { border: 1px solid #ccc; background: #fff; }
 .frequency-chip { display: inline-flex; gap: 8px; padding: 5px 8px; }
@@ -66,5 +99,6 @@ button { color: #fff; background: #222; cursor: pointer; }
 .node-freq { font-size: 10px; }
 @media (max-width: 650px) {
   .app-shell { width: calc(100% - 16px); }
-  .control-strip { grid-template-columns: 1fr; }
+  .control-strip, .file-strip { grid-template-columns: 1fr; }
+  .file-status { white-space: normal; }
 }

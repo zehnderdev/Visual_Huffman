@@ -1,5 +1,6 @@
 /**
- * This is a basic Node implementation for the Huffman Priority Queue
+ * This is a basic Node implementation for the Huffman Priority Queue.
+ * Leaf symbols can be text characters or byte values.
  */
 class HuffNode{
     char;

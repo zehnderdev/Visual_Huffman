@@ -10,14 +10,24 @@
   <main class="app-shell">
     <header class="app-header">
       <p class="eyebrow">Visual Huffman</p>
-      <h1>Huffman Layout Gallery</h1>
+      <h1>Huffman Compressor</h1>
     </header>
 
-    <form class="control-strip" onsubmit="event.preventDefault(); fullHuffman();">
-      <input id="Input" type="text" placeholder="Enter text" autocomplete="off">
-      <button id="Table" type="button" onclick="showHuffmanTable()" hidden>Table</button>
-      <button id="Full" type="submit">Build</button>
-    </form>
+    <div class="input-panels">
+      <form class="control-strip" onsubmit="event.preventDefault(); fullHuffman();">
+        <input id="Input" type="text" placeholder="Enter text" autocomplete="off">
+        <button id="Table" type="button" onclick="showHuffmanTable()" hidden>Table</button>
+        <button id="Full" type="submit">Build</button>
+      </form>
+
+      <form class="file-strip" onsubmit="event.preventDefault(); compressSelectedFile();">
+        <input id="FileInput" class="file-input" type="file" onchange="handleFileSelection(event)">
+        <label class="file-picker" for="FileInput">Choose file</label>
+        <button id="CompressFile" type="submit" disabled>Compress file</button>
+        <output id="FileStatus" class="file-status">No file selected.</output>
+        <a id="DownloadFile" class="download-link" href="#" hidden>Download .vhuff</a>
+      </form>
+    </div>
 
     <section id="huffmanTree" class="frequency-panel" aria-live="polite"></section>
     <section id="HuffmanRoot" class="tree-stage" aria-live="polite"></section>
