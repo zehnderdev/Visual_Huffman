@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Präfixfrei – Visual Huffman</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <p class="eyebrow">Visual Huffman</p>
+      <h1>Präfixfreier Code</h1>
+    </header>
+
+    <nav class="page-nav">
+      <a href="index.html">Huffman</a>
+      <a href="prefix.html" class="active">Präfixfrei</a>
+    </nav>
+
+    <p class="page-desc">
+      Ein Code ist präfixfrei, wenn kein Codewort ein Präfix eines anderen ist.
+      Gib deine Codes im Format <code>Symbol:Code</code> ein, getrennt durch Kommas.
+    </p>
+
+    <form class="control-strip" onsubmit="event.preventDefault(); checkPrefixFreeFromInput();">
+      <input id="CodeInput" type="text" placeholder="z.B. C:00, D:01, E:010" autocomplete="off">
+      <button type="submit">Prüfen</button>
+    </form>
+
+    <section id="PrefixResult" aria-live="polite"></section>
+  </main>
+
+  <script src="prefix.js"></script>
+</body>
+</html>

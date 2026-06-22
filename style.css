@@ -97,6 +97,43 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .tree-node.is-hot .node-core { stroke-width: 4px; }
 .node-symbol { font-size: 13px; font-weight: 700; }
 .node-freq { font-size: 10px; }
+.page-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+.page-nav a { color: #111; text-decoration: none; padding: 4px 12px; min-height: 32px; display: inline-flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; background: #fff; font-size: 13px; font-weight: 700; }
+.page-nav a.active { color: #fff; background: #222; border-color: #222; }
+.page-desc { margin: 0 0 14px; color: #555; font-size: 14px; line-height: 1.5; }
+.page-desc code { font-family: "Courier New", monospace; background: #f0f0f0; padding: 1px 4px; border-radius: 3px; }
+
+.prefix-status { padding: 10px 14px; font-size: 18px; font-weight: 700; margin-bottom: 12px; border-radius: 4px; }
+.status-ok { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.status-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+.code-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.code-chip { display: inline-flex; gap: 4px; align-items: center; padding: 5px 10px; border: 2px solid #ccc; background: #fff; font-family: "Courier New", monospace; font-size: 14px; border-radius: 4px; }
+.chip-ok { border-color: #27ae60; }
+.chip-violation { border-color: #c0392b; background: #fff5f5; }
+.chip-symbol { font-weight: 700; }
+.chip-sep { color: #999; margin: 0 1px; }
+
+.problems-section { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.problem-item { padding: 8px 12px; border: 1px solid; border-radius: 4px; }
+.problem-prefix { background: #fff5f5; border-color: #f5c6cb; color: #721c24; }
+.problem-duplicate { background: #fff3cd; border-color: #ffc107; color: #856404; }
+
+.trie-heading { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+.trie-container { border: 1px solid #ccc; background: #fff; overflow-x: auto; }
+.trie-svg { display: block; width: 100%; height: auto; }
+.trie-edge { stroke-width: 2px; fill: none; }
+.trie-edge.code-zero { stroke: #006b5b; }
+.trie-edge.code-one { stroke: #9a2d20; }
+.trie-edge-label { font-family: "Courier New", monospace; font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+.trie-edge-label.code-zero { fill: #006b5b; }
+.trie-edge-label.code-one { fill: #9a2d20; }
+.trie-node circle { fill: #eee; stroke: #888; stroke-width: 2px; }
+.trie-node.node-ok circle { fill: #d4edda; stroke: #27ae60; stroke-width: 2.5px; }
+.trie-node.node-violation circle { fill: #f8d7da; stroke: #c0392b; stroke-width: 2.5px; }
+.trie-node-label { font-family: "Courier New", monospace; font-weight: 700; text-anchor: middle; dominant-baseline: middle; fill: #111; pointer-events: none; }
+.trie-node-code { font-family: "Courier New", monospace; font-size: 10px; text-anchor: middle; fill: #555; pointer-events: none; }
+
 @media (max-width: 650px) {
   .app-shell { width: calc(100% - 16px); }
   .control-strip, .file-strip { grid-template-columns: 1fr; }
